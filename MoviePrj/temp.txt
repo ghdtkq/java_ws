@@ -1,2 +1,0 @@
-admin,30,admin,admin,admin
-양홍섭,26,bb,123,bb

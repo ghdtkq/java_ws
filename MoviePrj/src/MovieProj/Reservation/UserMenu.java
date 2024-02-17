@@ -18,7 +18,7 @@ public class UserMenu {
                     MovieMenu.showMovieMenu(sc, id);
                     break;
                 case 2:
-                    MyPage.showMyPageMenu(sc, id);
+                    MyPage.showMyPageMenu(sc);
                     break;
                 case 3:
                     System.out.println("로그아웃되었습니다.");

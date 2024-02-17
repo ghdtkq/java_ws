@@ -1,3 +1,2 @@
-admin,30,admin,admin,admin
-양홍섭,24,aa,123,aaa
-양홍섭,26,bb,123,bb
+admin,99,admin,admin,admin
+양홍섭,24,ghdtkq,123,ghdtkq

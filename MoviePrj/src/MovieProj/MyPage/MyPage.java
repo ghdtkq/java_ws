@@ -24,14 +24,17 @@ public class MyPage {
 
             switch (choice) {
                 case 1:
-                    changeNickname(sc); //닉네임 변경
+                	//닉네임 변경
+                    changeNickname(sc); 
+                    loginMenu();
                     break;
-
                 case 2:
-                	Files.delete();
                 	//회원탈퇴
+                	String loggedInNickname = Login.getLoggedInNickname();
+                	withdrawMembership(loggedInNickname);
+                	loggedIn = false;
+                    loginMenu();
                     break;
-
                 default:
                     System.out.println("잘못된 선택입니다.");
             }
@@ -59,31 +62,26 @@ public class MyPage {
         }
     }
 
-    //닉네임이 맞는지 확인
+    //닉네임 일치 여부
     private static boolean isNicknameExists(String nickname) {
-        boolean existNickname = false;
         try (BufferedReader br = new BufferedReader(new FileReader(USERS_FILE))) {
             String line;
             while ((line = br.readLine()) != null) {
                 String[] userInfo = line.split(",");
                 String existingNickname = userInfo[4].trim();
-                if (existingNickname.equals(nickname.trim())) {
-                    existNickname = true;
-                    break;
+                if (existingNickname.equals(nickname)) {
+                    return true; // 닉네임 일치
                 }
             }
         } catch (IOException e) {
-            System.out.println("에러.");
-            e.printStackTrace();
+            System.out.println("닉네임이 일치하지 않습니다.");
         }
-        return existNickname;
+        return false; // 닉네임 불일치
     }
 
 
-    
     private static boolean updateNickname(String currentNickname, String newNickname) {
         try {
-
             StringBuilder updateContent = new StringBuilder();
 
             File usersFile = new File(USERS_FILE);
@@ -91,16 +89,59 @@ public class MyPage {
             BufferedReader br = new BufferedReader(fr);
 
             String line;
-            boolean nicknameUpdated = false;
             while ((line = br.readLine()) != null) {
-
                 String[] userInfo = line.split(",");
                 String existingNickname = userInfo[4].trim();
 
+                // 해당 라인이 현재 사용자 닉네임과 일치하는지 확인
                 if (existingNickname.equals(currentNickname)) {
+                    // 새로운 닉네임으로 변경
                     userInfo[4] = newNickname;
                     line = String.join(",", userInfo);
-                    nicknameUpdated = true;
+                }
+
+                // 변경 내용에 라인 추가
+                updateContent.append(line).append('\n');
+            }
+
+            br.close();
+            fr.close();
+
+            // 파일에 변경 내용 쓰기
+            FileWriter fw = new FileWriter(usersFile);
+            BufferedWriter bw = new BufferedWriter(fw);
+            bw.write(updateContent.toString());
+            bw.close();
+            fw.close();
+
+            return true; // 닉네임 변경 성공
+        } catch (IOException e) {
+            System.out.println("닉네임 변경 실패..");
+            return false; // 변경 실패
+        }
+    }
+    
+    //회원탈퇴
+    private static void withdrawMembership(String nickname) {
+        try {
+            File usersFile = new File(USERS_FILE);
+            FileReader fr = new FileReader(usersFile);
+            BufferedReader br = new BufferedReader(fr);
+
+            StringBuilder updateContent = new StringBuilder();
+            String line;
+            boolean foundUser = false;
+
+            
+            while ((line = br.readLine()) != null) {
+                // 라인을 사용자 정보로 분할
+                String[] userInfo = line.split(",");
+                String existingNickname = userInfo[4].trim();
+
+                // 라인이 로그인된 사용자와 일치하는지 확인
+                if (existingNickname.equals(nickname)) {
+                    foundUser = true; // 사용자 찾기
+                    continue; // 라인 스킵
                 }
 
                 updateContent.append(line).append('\n');
@@ -109,76 +150,20 @@ public class MyPage {
             br.close();
             fr.close();
 
-            if (nicknameUpdated) {
-                FileWriter fw = new FileWriter(usersFile);
-                BufferedWriter bw = new BufferedWriter(fw);
-                bw.write(updateContent.toString());
-                bw.close();
-                fw.close();
-                return true;
-            } else {
-                System.out.println("닉네임 변경에 실패하였습니다.");
-                return false;
+            if (!foundUser) {
+                System.out.println("회원 조회가 불가능합니다.");
+                return;
             }
+
+            FileWriter fw = new FileWriter(usersFile);
+            BufferedWriter bw = new BufferedWriter(fw);
+            bw.write(updateContent.toString());
+            bw.close();
+            fw.close();
+
+            System.out.println(nickname + " 님의 회원탈퇴가 정상적으로 처리되었습니다.");
         } catch (IOException e) {
-            System.out.println("닉네임 변경에 실패하였습니다.");
-            e.printStackTrace();
-            return false;
+            System.out.println("오류발생! 다시 시도해주세요.");
         }
-    }
-    
-    //회원탈퇴
-    public static void deleteLine(String USERS_FILE, int lineNumber) {
-        try {
-            File inputFile = new File(USERS_FILE);
-            File tempFile = new File("temp.txt");
-
-            BufferedReader reader = new BufferedReader(new FileReader(inputFile));
-            BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile));
-
-            String lineToRemove = "";
-            String currentLine;
-
-            int lineNum = 0;
-            while ((currentLine = reader.readLine()) != null) {
-                lineNum++;
-                // If this is the line to be deleted, skip writing it to the temp file
-                if (lineNum == lineNumber) {
-                    lineToRemove = currentLine;
-                    continue;
-                }
-                writer.write(currentLine + System.getProperty("line.separator"));
-            }
-            writer.close();
-            reader.close();
-
-            // Check if the original file exists before attempting to delete it
-            if (!inputFile.exists()) {
-                System.out.println("Failed to delete the line: Original file does not exist.");
-                return; // Exit method if the file does not exist
-            }
-
-            // Delete the original file
-            if (!inputFile.delete()) {
-                System.out.println("Failed to delete the line: Unable to delete the original file.");
-                return; // Exit method if unable to delete the original file
-            }
-
-            // Rename the temporary file to the original filename
-            if (!tempFile.renameTo(inputFile)) {
-                System.out.println("Failed to delete the line: Unable to rename the temporary file.");
-
-                // If renaming failed, delete the temporary file
-                if (!tempFile.exists() || !tempFile.delete()) {
-                    System.out.println("Failed to delete the temporary file.");
-                }
-            } else {
-                System.out.println("Line deleted successfully: " + lineToRemove);
-            }
-        } catch (IOException e) {
-            System.out.println("Failed to delete the line: An error occurred.");
-            e.printStackTrace();
-        }
-        
     }
     }

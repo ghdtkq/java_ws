@@ -10,6 +10,7 @@ import java.util.Scanner;
 
 public class Login {
     private static final String USERS_FILE = "users.txt";
+    private static String loggedInNickname;
 
     public static boolean login(Scanner sc) {
         System.out.print("아이디: ");
@@ -28,6 +29,7 @@ public class Login {
                         System.out.println("관리자로 로그인");
                         AdminMenu.showAdminMenu(sc);
                     }
+                    loggedInNickname = userInfo[4];
                     System.out.println(userInfo[4]+"님 환영합니다.");
                     UserMenu.showUserMenu(sc, id);
                     return true; // 로그인 성공
@@ -40,6 +42,10 @@ public class Login {
 
         System.out.println("아이디 또는 비밀번호가 일치하지 않습니다. 다시 시도해주세요.");
         return false; // 로그인 실패
+    }
+    
+    public static String getLoggedInNickname() {
+        return loggedInNickname;
     }
 
     public static void loginMenu() {
@@ -62,5 +68,6 @@ public class Login {
                     System.out.println("잘못된 선택입니다. 다시 선택해주세요.");
             }
         }
-    }
+    }    
+
 }
