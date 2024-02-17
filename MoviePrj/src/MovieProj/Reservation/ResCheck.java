@@ -4,7 +4,7 @@ import java.io.*;
 public class ResCheck {
 	
 	public static void resCheck(String id){
-	final String Res_file = "res.txt";
+	final String Res_file = "movies.txt";
 		
 		try
 		(
@@ -22,11 +22,13 @@ public class ResCheck {
 				 String userId = resInfo[0].trim();
 				 String whereIs = resInfo[1].trim();
 				 String movieTitle = resInfo[2].trim();
-				 String runTime = resInfo[3].trim();
-				 String seatNum = resInfo[4].trim();
+				 String runDate = resInfo[3].trim();
+				 String runTime = resInfo[4].trim();
+				 String resPeople = resInfo[5].trim();
+				 String seatNum = resInfo[6].trim();
 				 
 				 if(userId.equals(id)) {
-					 resList[chk] = chk+1+"번예약 | " + "점포명 : "+whereIs+" 영화제목 : "+movieTitle+" 상영시간 : "+runTime+" 좌석번호 : "+seatNum;
+					 resList[chk] = chk+1+"번예약 | " + "점포명 : "+whereIs+" 영화제목 : "+movieTitle+" 상영날짜 : "+runDate+" 상영시간 : "+runTime + " 예약인수 : "+resPeople+" 좌석번호 : "+seatNum;
 					 System.out.println(resList[chk]);
 					 reservated = true;
 					 chk++;

@@ -29,7 +29,7 @@ public class Login {
                         AdminMenu.showAdminMenu(sc);
                     }
                     System.out.println(userInfo[4]+"님 환영합니다.");
-					UserMenu.showUserMenu(sc, id, existingPassword);
+                    UserMenu.showUserMenu(sc, id);
                     return true; // 로그인 성공
                 }
             }

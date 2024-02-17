@@ -1,11 +1,12 @@
 package MovieProj.Reservation;
 
+import MovieProj.Login.Login;
 import MovieProj.MyPage.MyPage;
 
 import java.util.Scanner;
 
 public class UserMenu {
-    public static void showUserMenu(Scanner sc, String id, String loggedInUserName) {
+    public static void showUserMenu(Scanner sc, String id) {
         boolean loggedIn = true;
 
         while (loggedIn) {
@@ -17,11 +18,12 @@ public class UserMenu {
                     MovieMenu.showMovieMenu(sc, id);
                     break;
                 case 2:
-                    MyPage.showMyPageMenu(sc, loggedInUserName);
+                    MyPage.showMyPageMenu(sc, id);
                     break;
                 case 3:
                     System.out.println("로그아웃되었습니다.");
                     loggedIn = false;
+                    Login.loginMenu();
                     break;
                 default:
                     System.out.println("잘못된 선택입니다. 다시 선택해주세요.");

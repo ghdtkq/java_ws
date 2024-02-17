@@ -1,5 +1,7 @@
 package MovieProj.Admin;
 
+import MovieProj.Reservation.UserMenu;
+
 import java.util.Scanner;
 
 import static MovieProj.Login.Login.loginMenu;
@@ -9,22 +11,14 @@ public class AdminMenu {
         boolean loggedIn = true;
 
         while (loggedIn) {
-            System.out.println("=====  1.영화 리스트  2.영화 추가  3.영화 삭제  4.로그아웃  =====");
-            System.out.print("선택: ");
-            int choice = sc.nextInt();
-            sc.nextLine();
+            System.out.println("=====  1.예매 내역 전체 보기  2.로그아웃  =====");
+            int choice = UserMenu.inputChoice(sc);
 
             switch (choice) {
                 case 1:
-                    // 영화 리스트 보여주기
+                    ResList.showResList();
                     break;
                 case 2:
-                    // 영화 추가 기능
-                    break;
-                case 3:
-                    // 영화 삭제 기능
-                    break;
-                case 4:
                     System.out.println("로그아웃되었습니다.");
                     loginMenu();
                     break;

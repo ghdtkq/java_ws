@@ -6,13 +6,14 @@ import MovieProj.Login.Login;
 import java.util.*;
 import java.io.*;
 import java.nio.*;
+import java.nio.file.*;
 
 import static MovieProj.Login.Login.loginMenu;
 
 public class MyPage {
     private static final String USERS_FILE = "users.txt";
 
-    public static void showMyPageMenu(Scanner sc, String loggedInUserName) {
+    public static void showMyPageMenu(Scanner sc) {
         boolean loggedIn = true;
 
         while (loggedIn) {
@@ -27,8 +28,8 @@ public class MyPage {
                     break;
 
                 case 2:
-				deleteAccount(sc, loggedInUserName); // 회원탈퇴
-                    loggedIn = false;
+                	Files.delete();
+                	//회원탈퇴
                     break;
 
                 default:
@@ -125,68 +126,59 @@ public class MyPage {
             return false;
         }
     }
+    
+    //회원탈퇴
+    public static void deleteLine(String USERS_FILE, int lineNumber) {
+        try {
+            File inputFile = new File(USERS_FILE);
+            File tempFile = new File("temp.txt");
 
-    //회원 탈퇴
-    private static void deleteAccount(Scanner sc, String loggedInUserName) {
-    	isNicknameExists(loggedInUserName);
-    	
-        System.out.println("Are you sure you want to cancel your membership? (yes/no)");
-        String answer = sc.nextLine();
+            BufferedReader reader = new BufferedReader(new FileReader(inputFile));
+            BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile));
 
-        if (answer.equalsIgnoreCase("yes")) {
-            // Delete the user's information from the file
-            try {
-                File inputFile = new File(USERS_FILE);
-                File tempFile = new File("temp.txt");
+            String lineToRemove = "";
+            String currentLine;
 
-                Scanner fileScanner = new Scanner(inputFile);
-                FileWriter writer = new FileWriter(tempFile);
-
-                while (fileScanner.hasNextLine()) {
-                    String line = fileScanner.nextLine();
-                    String[] parts = line.split(",");
-                    // Assuming each line contains user information in the format: username,nickname,email
-                    // Check if the username matches the currently logged-in user
-                    // and do not write it to the temp file
-                    if (!parts[0].equals(loggedInUserName)) {
-                        writer.write(line + System.lineSeparator());
-                    }
+            int lineNum = 0;
+            while ((currentLine = reader.readLine()) != null) {
+                lineNum++;
+                // If this is the line to be deleted, skip writing it to the temp file
+                if (lineNum == lineNumber) {
+                    lineToRemove = currentLine;
+                    continue;
                 }
-
-                fileScanner.close();
-                writer.close();
-
-                // Delete the original file
-                try {
-                    if (!inputFile.delete()) {
-                        System.out.println("Error: Failed to delete the original file. Possible reasons:");
-                        System.out.println("- The file is in use by another process.");
-                        System.out.println("- Insufficient permissions to delete the file.");
-                        System.out.println("- The file does not exist.");
-                        return;
-                    }
-                } catch (SecurityException e) {
-                    System.out.println("Error: Security exception occurred. Insufficient permissions to delete the file.");
-                    return;
-                } catch (Exception e) {
-                    System.out.println("Error: Failed to delete the original file due to an unexpected error: " + e.getMessage());
-                    return;
-                }
-
-                // Rename the temp file to the original filename
-                if (!tempFile.renameTo(inputFile)) {
-                    System.out.println("Error: Failed to rename the temp file.");
-                }
-
-                System.out.println("Membership canceled successfully.");
-            } catch (FileNotFoundException e) {
-                System.out.println("Error: Users file not found.");
-            } catch (IOException e) {
-                System.out.println("Error: IO exception occurred.");
+                writer.write(currentLine + System.getProperty("line.separator"));
             }
-        } else {
-            System.out.println("Membership cancellation aborted.");
-        }
-    }
+            writer.close();
+            reader.close();
 
-}
+            // Check if the original file exists before attempting to delete it
+            if (!inputFile.exists()) {
+                System.out.println("Failed to delete the line: Original file does not exist.");
+                return; // Exit method if the file does not exist
+            }
+
+            // Delete the original file
+            if (!inputFile.delete()) {
+                System.out.println("Failed to delete the line: Unable to delete the original file.");
+                return; // Exit method if unable to delete the original file
+            }
+
+            // Rename the temporary file to the original filename
+            if (!tempFile.renameTo(inputFile)) {
+                System.out.println("Failed to delete the line: Unable to rename the temporary file.");
+
+                // If renaming failed, delete the temporary file
+                if (!tempFile.exists() || !tempFile.delete()) {
+                    System.out.println("Failed to delete the temporary file.");
+                }
+            } else {
+                System.out.println("Line deleted successfully: " + lineToRemove);
+            }
+        } catch (IOException e) {
+            System.out.println("Failed to delete the line: An error occurred.");
+            e.printStackTrace();
+        }
+        
+    }
+    }
