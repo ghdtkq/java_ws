@@ -12,7 +12,7 @@ import static MovieProj.Login.Login.loginMenu;
 public class MyPage {
     private static final String USERS_FILE = "users.txt";
 
-    public static void showMyPageMenu(Scanner sc) {
+    public static void showMyPageMenu(Scanner sc, String loggedInUserName) {
         boolean loggedIn = true;
 
         while (loggedIn) {
@@ -27,7 +27,7 @@ public class MyPage {
                     break;
 
                 case 2:
-                    deleteAccount(sc); // 회원탈퇴
+				deleteAccount(sc, loggedInUserName); // 회원탈퇴
                     loggedIn = false;
                     break;
 
@@ -37,7 +37,7 @@ public class MyPage {
         }
     }
 
-    //닉네임 변경 메서드
+    //닉네임 변경
     private static void changeNickname(Scanner sc) {
         System.out.print("현재 닉네임을 입력해주세요: ");
         String currentNickname = sc.nextLine();
@@ -50,7 +50,7 @@ public class MyPage {
         System.out.print("새로운 닉네임을 입력해주세요: ");
         String newNickname = sc.nextLine();
 
-        //updateNickname 메서드 호출
+        
         if (updateNickname(currentNickname, newNickname)) {
             System.out.println("닉네임이 변경되었습니다: " + newNickname);
         } else {
@@ -58,7 +58,7 @@ public class MyPage {
         }
     }
 
-    //닉네임이 맞는지 확인하는 메서드
+    //닉네임이 맞는지 확인
     private static boolean isNicknameExists(String nickname) {
         boolean existNickname = false;
         try (BufferedReader br = new BufferedReader(new FileReader(USERS_FILE))) {
@@ -79,6 +79,7 @@ public class MyPage {
     }
 
 
+    
     private static boolean updateNickname(String currentNickname, String newNickname) {
         try {
 
@@ -125,32 +126,67 @@ public class MyPage {
         }
     }
 
-    public static void deleteAccount(Scanner sc) {
-        System.out.print("삭제하실 회원님의 닉네임을 입력해주세요: ");
-        String currentNickname = sc.nextLine();
+    //회원 탈퇴
+    private static void deleteAccount(Scanner sc, String loggedInUserName) {
+    	isNicknameExists(loggedInUserName);
+    	
+        System.out.println("Are you sure you want to cancel your membership? (yes/no)");
+        String answer = sc.nextLine();
 
-        String sourceFilePath = "users.txt";
+        if (answer.equalsIgnoreCase("yes")) {
+            // Delete the user's information from the file
+            try {
+                File inputFile = new File(USERS_FILE);
+                File tempFile = new File("temp.txt");
 
-        try (
-                BufferedReader reader = new BufferedReader(new FileReader(sourceFilePath));
-                BufferedWriter writer = new BufferedWriter(new FileWriter(sourceFilePath))
-        ) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                // Split the line by comma
-                String[] userInfo = line.split(",");
-                // Check if the nickname is in the line
-                if (userInfo[4].trim().equals(currentNickname)) {
-                    // Modify the line to "1"
-                    line = "1";
+                Scanner fileScanner = new Scanner(inputFile);
+                FileWriter writer = new FileWriter(tempFile);
+
+                while (fileScanner.hasNextLine()) {
+                    String line = fileScanner.nextLine();
+                    String[] parts = line.split(",");
+                    // Assuming each line contains user information in the format: username,nickname,email
+                    // Check if the username matches the currently logged-in user
+                    // and do not write it to the temp file
+                    if (!parts[0].equals(loggedInUserName)) {
+                        writer.write(line + System.lineSeparator());
+                    }
                 }
-                // Write the modified line to the temporary file
-                writer.write(line);
-                writer.newLine();
-            }
-        } catch (IOException e) {
-            System.err.println("Error: " + e.getMessage());
-        }
 
+                fileScanner.close();
+                writer.close();
+
+                // Delete the original file
+                try {
+                    if (!inputFile.delete()) {
+                        System.out.println("Error: Failed to delete the original file. Possible reasons:");
+                        System.out.println("- The file is in use by another process.");
+                        System.out.println("- Insufficient permissions to delete the file.");
+                        System.out.println("- The file does not exist.");
+                        return;
+                    }
+                } catch (SecurityException e) {
+                    System.out.println("Error: Security exception occurred. Insufficient permissions to delete the file.");
+                    return;
+                } catch (Exception e) {
+                    System.out.println("Error: Failed to delete the original file due to an unexpected error: " + e.getMessage());
+                    return;
+                }
+
+                // Rename the temp file to the original filename
+                if (!tempFile.renameTo(inputFile)) {
+                    System.out.println("Error: Failed to rename the temp file.");
+                }
+
+                System.out.println("Membership canceled successfully.");
+            } catch (FileNotFoundException e) {
+                System.out.println("Error: Users file not found.");
+            } catch (IOException e) {
+                System.out.println("Error: IO exception occurred.");
+            }
+        } else {
+            System.out.println("Membership cancellation aborted.");
+        }
     }
+
 }

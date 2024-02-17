@@ -5,7 +5,7 @@ import MovieProj.MyPage.MyPage;
 import java.util.Scanner;
 
 public class UserMenu {
-    public static void showUserMenu(Scanner sc, String id) {
+    public static void showUserMenu(Scanner sc, String id, String loggedInUserName) {
         boolean loggedIn = true;
 
         while (loggedIn) {
@@ -17,7 +17,7 @@ public class UserMenu {
                     MovieMenu.showMovieMenu(sc, id);
                     break;
                 case 2:
-                    MyPage.showMyPageMenu(sc);
+                    MyPage.showMyPageMenu(sc, loggedInUserName);
                     break;
                 case 3:
                     System.out.println("로그아웃되었습니다.");
