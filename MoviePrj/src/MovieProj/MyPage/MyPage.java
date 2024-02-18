@@ -24,15 +24,15 @@ public class MyPage {
 
             switch (choice) {
                 case 1:
-                	//닉네임 변경
-                    changeNickname(sc); 
-                    loginMenu();
+                    //닉네임 변경
+                    changeNickname(sc);
                     break;
                 case 2:
-                	//회원탈퇴
-                	String loggedInNickname = Login.getLoggedInNickname();
-                	withdrawMembership(loggedInNickname);
-                	loggedIn = false;
+                    //회원탈퇴
+                    String currentNickname = Login.getLoggedInNickname();
+                    String newNickname = getNewNickname(); // 변경된 닉네임 검색
+                    withdrawMembership(currentNickname, newNickname); //
+                    loggedIn = false;
                     loginMenu();
                     break;
                 default:
@@ -40,6 +40,7 @@ public class MyPage {
             }
         }
     }
+    
 
     //닉네임 변경
     private static void changeNickname(Scanner sc) {
@@ -54,12 +55,22 @@ public class MyPage {
         System.out.print("새로운 닉네임을 입력해주세요: ");
         String newNickname = sc.nextLine();
 
-        
         if (updateNickname(currentNickname, newNickname)) {
             System.out.println("닉네임이 변경되었습니다: " + newNickname);
+            setNewNickname(newNickname); // 변경된 닉네임 저장
         } else {
             System.out.println("닉네임 변경에 실패하였습니다.");
         }
+    }
+
+    // 변경된 닉네임 저장하게 해줌
+    private static void setNewNickname(String newNickname) {
+        Login.setLoggedInNickname(newNickname);
+    }
+
+    // 변경된 닉네임 검색?
+    private static String getNewNickname() {
+        return Login.getLoggedInNickname();
     }
 
     //닉네임 일치 여부
@@ -78,7 +89,6 @@ public class MyPage {
         }
         return false; // 닉네임 불일치
     }
-
 
     private static boolean updateNickname(String currentNickname, String newNickname) {
         try {
@@ -120,9 +130,9 @@ public class MyPage {
             return false; // 변경 실패
         }
     }
-    
+
     //회원탈퇴
-    private static void withdrawMembership(String nickname) {
+    private static void withdrawMembership(String currentNickname, String newNickname) {
         try {
             File usersFile = new File(USERS_FILE);
             FileReader fr = new FileReader(usersFile);
@@ -132,18 +142,18 @@ public class MyPage {
             String line;
             boolean foundUser = false;
 
-            
             while ((line = br.readLine()) != null) {
                 // 라인을 사용자 정보로 분할
                 String[] userInfo = line.split(",");
                 String existingNickname = userInfo[4].trim();
 
                 // 라인이 로그인된 사용자와 일치하는지 확인
-                if (existingNickname.equals(nickname)) {
+                if (existingNickname.equals(currentNickname) || existingNickname.equals(newNickname)) {
                     foundUser = true; // 사용자 찾기
-                    continue; // 라인 스킵
+                    continue; // 해당 사용자 라인은 스킵
                 }
 
+                // 변경 내용에 라인 추가
                 updateContent.append(line).append('\n');
             }
 
@@ -151,19 +161,24 @@ public class MyPage {
             fr.close();
 
             if (!foundUser) {
-                System.out.println("회원 조회가 불가능합니다.");
+                System.out.println("해당 사용자를 찾을 수 없습니다.");
                 return;
             }
 
             FileWriter fw = new FileWriter(usersFile);
             BufferedWriter bw = new BufferedWriter(fw);
-            bw.write(updateContent.toString());
+
+            // 수정된 내용이 없는 경우 파일에 쓰지 않음
+            if (updateContent.length() > 0) {
+                bw.write(updateContent.toString());
+            }
+
             bw.close();
             fw.close();
 
-            System.out.println(nickname + " 님의 회원탈퇴가 정상적으로 처리되었습니다.");
+            System.out.println(currentNickname + " 님의 회원탈퇴가 정상적으로 처리되었습니다.");
         } catch (IOException e) {
             System.out.println("오류발생! 다시 시도해주세요.");
         }
     }
-    }
+}

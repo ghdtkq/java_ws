@@ -2,6 +2,7 @@ package MovieProj.Login;
 
 import MovieProj.Admin.AdminMenu;
 import MovieProj.Reservation.UserMenu;
+import MovieProj.MyPage.*;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -11,7 +12,7 @@ import java.util.Scanner;
 public class Login {
     private static final String USERS_FILE = "users.txt";
     private static String loggedInNickname;
-
+    
     public static boolean login(Scanner sc) {
         System.out.print("아이디: ");
         String id = sc.next();
@@ -43,10 +44,7 @@ public class Login {
         System.out.println("아이디 또는 비밀번호가 일치하지 않습니다. 다시 시도해주세요.");
         return false; // 로그인 실패
     }
-    
-    public static String getLoggedInNickname() {
-        return loggedInNickname;
-    }
+
 
     public static void loginMenu() {
         Scanner sc = new Scanner(System.in);
@@ -68,6 +66,16 @@ public class Login {
                     System.out.println("잘못된 선택입니다. 다시 선택해주세요.");
             }
         }
-    }    
+    }
+    
+    
+    public static String getLoggedInNickname() {
+        return loggedInNickname;
+    }
+
+    public static void setLoggedInNickname(String nickname) {
+        loggedInNickname = nickname;
+    }
+
 
 }
