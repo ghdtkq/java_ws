@@ -21,7 +21,7 @@ public class MyPage {
 
             switch (choice) {
                 case 1:
-                    changeInformation(sc);
+                    changeInformation(sc, id);
                     break;
                 case 2:
                     withdrawMembership(sc);
@@ -36,8 +36,8 @@ public class MyPage {
         }
     }
 
-    private static void changeInformation(Scanner sc) {
-        System.out.println("===== 1. 닉네임 변경 2. 비밀번호 변경 =====");
+    private static void changeInformation(Scanner sc, String id) {
+        System.out.println("===== 1. 닉네임 변경 2. 비밀번호 변경 3. 뒤로가기=====");
         int choice = sc.nextInt();
         sc.nextLine();
 
@@ -48,36 +48,46 @@ public class MyPage {
             case 2:
                 changePassword(sc);
                 break;
+            case 3:
+            	showMyPageMenu(sc, id);
             default:
                 System.out.println("잘못된 선택입니다.");
         }
     }
 
     private static void changeNickname(Scanner sc) {
-        String currentLoggedInNickname = Login.getLoggedInNickname(); // 현재 로그인된 사용자의 닉네임 가져오기
+        String currentLoggedInNickname = Login.getLoggedInNickname();
 
-        System.out.print("닉네임을 입력해주세요: ");
-        String currentNickname = sc.nextLine();
-
-        if (!currentNickname.equals(currentLoggedInNickname)) { // 입력된 닉네임과 로그인된 닉네임이 다를 경우
-            System.out.println("현재 로그인된 사용자의 닉네임만 변경할 수 있습니다.");
-            return;
-        }
-
-        System.out.print("변경할 닉네임을 입력해주세요: ");
+        System.out.print("새 닉네임을 입력해주세요: ");
         String newNickname = sc.nextLine();
 
-        if (!currentNickname.equals(newNickname) && isNicknameExists(newNickname)) {
-            System.out.println("이미 존재하는 닉네임입니다. 다시 시도해주세요.");
-            return;
-        }
-
-        if (updateNickname(currentNickname, newNickname)) {
-            System.out.println(newNickname + " 닉네임으로 변경하였습니다.");
-            setNewNickname(newNickname);
+        if (isNicknameAvailable(newNickname)) { // 입력된 닉네임이 사용 가능한지 확인
+            if (updateNickname(currentLoggedInNickname, newNickname)) { // 닉네임 업데이트
+                System.out.println(newNickname + " 닉네임으로 변경하였습니다.");
+                setNewNickname(newNickname); // 로그인 정보에 새로운 닉네임 설정
+            } else {
+                System.out.println("닉네임 변경에 실패하였습니다.");
+            }
         } else {
-            System.out.println("닉네임 변경에 실패하였습니다.");
+            System.out.println("이미 존재하는 닉네임입니다. 다른 닉네임을 입력해주세요.");
         }
+    }
+
+    // 새로운 닉네임이 이미 존재하는지 확인하는 메소드
+    private static boolean isNicknameAvailable(String newNickname) {
+        try (BufferedReader br = new BufferedReader(new FileReader(USERS_FILE))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] userInfo = line.split(",");
+                String existingNickname = userInfo[4].trim();
+                if (existingNickname.equals(newNickname)) {
+                    return false; // 이미 존재하는 닉네임이면 false 반환
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("닉네임 확인에 오류가 발생하였습니다.");
+        }
+        return true; // 존재하지 않는 닉네임이면 true 반환
     }
 
     private static void changePassword(Scanner sc) {
@@ -122,8 +132,7 @@ public class MyPage {
         try {
             StringBuilder updateContent = new StringBuilder();
 
-            File usersFile = new File(USERS_FILE);
-            FileReader fr = new FileReader(usersFile);
+            FileReader fr = new FileReader(USERS_FILE);
             BufferedReader br = new BufferedReader(fr);
 
             String line;
@@ -142,7 +151,7 @@ public class MyPage {
             br.close();
             fr.close();
 
-            FileWriter fw = new FileWriter(usersFile);
+            FileWriter fw = new FileWriter(USERS_FILE);
             BufferedWriter bw = new BufferedWriter(fw);
             bw.write(updateContent.toString());
             bw.close();
@@ -163,32 +172,11 @@ public class MyPage {
         Login.setLoggedInNickname(newNickname);
     }
 
-    private static String getNewNickname() {
-        return Login.getLoggedInNickname();
-    }
-
-    private static boolean isNicknameExists(String nickname) {
-        try (BufferedReader br = new BufferedReader(new FileReader(USERS_FILE))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                String[] userInfo = line.split(",");
-                String existingNickname = userInfo[4].trim();
-                if (existingNickname.equals(nickname)) {
-                    return true;
-                }
-            }
-        } catch (IOException e) {
-            System.out.println("닉네임 인증 오류입니다.");
-        }
-        return false;
-    }
-
     private static boolean updateNickname(String currentNickname, String newNickname) {
         try {
             StringBuilder updateContent = new StringBuilder();
 
-            File usersFile = new File(USERS_FILE);
-            FileReader fr = new FileReader(usersFile);
+            FileReader fr = new FileReader(USERS_FILE);
             BufferedReader br = new BufferedReader(fr);
 
             String line;
@@ -207,7 +195,7 @@ public class MyPage {
             br.close();
             fr.close();
 
-            FileWriter fw = new FileWriter(usersFile);
+            FileWriter fw = new FileWriter(USERS_FILE);
             BufferedWriter bw = new BufferedWriter(fw);
             bw.write(updateContent.toString());
             bw.close();
@@ -221,31 +209,31 @@ public class MyPage {
     }
 
     private static void withdrawMembership(Scanner sc) {
-        System.out.print("비밀번호 확인: ");
-        String inputPassword = sc.nextLine();
-        String currentPassword = Login.getLoggedInPassword();
+        
+            System.out.print("비밀번호 확인: ");
+            String inputPassword = sc.nextLine();
+            String currentPassword = Login.getLoggedInPassword();
 
-        if (inputPassword.equals(currentPassword)) {
-            System.out.print("정말 회원탈퇴 하시겠습니까? (예/아니요): ");
-            String confirmation = sc.nextLine();
-            if (confirmation.equalsIgnoreCase("예")) {
-                String currentNickname = Login.getLoggedInNickname();
-                withdrawMembership(currentNickname);
-                loginMenu();
+            if (inputPassword.equals(currentPassword)) {
+                System.out.print("정말 회원탈퇴 하시겠습니까? (예/아니요): ");
+                String confirmation = sc.nextLine();
+                if (confirmation.equalsIgnoreCase("예")) {
+                    String currentNickname = Login.getLoggedInNickname();
+                    withdrawMembership(currentNickname);
+                    loginMenu();
+                } else {
+                    System.out.println("회원탈퇴가 취소되었습니다.");
+                }
             } else {
-                System.out.println("회원탈퇴가 취소되었습니다.");
+                System.out.println("비밀번호를 잘못 입력하셨습니다. 다시 시도해주세요.");
             }
-        } else {
-            System.out.println("비밀번호를 잘못 입력하셨습니다.");
         }
-    }
 
     private static void withdrawMembership(String currentNickname) {
         try {
             StringBuilder updateContent = new StringBuilder();
 
-            File usersFile = new File(USERS_FILE);
-            FileReader fr = new FileReader(usersFile);
+            FileReader fr = new FileReader(USERS_FILE);
             BufferedReader br = new BufferedReader(fr);
 
             String line;
@@ -261,7 +249,7 @@ public class MyPage {
             br.close();
             fr.close();
 
-            FileWriter fw = new FileWriter(usersFile);
+            FileWriter fw = new FileWriter(USERS_FILE);
             BufferedWriter bw = new BufferedWriter(fw);
             bw.write(updateContent.toString());
             bw.close();

@@ -12,7 +12,7 @@ import java.util.Scanner;
 public class Login {
     private static final String USERS_FILE = "users.txt";
     private static String loggedInNickname;
-    private static String LoggedInPassword;
+    private static String loggedInPassword;
 
     public static boolean login(Scanner sc) {
         System.out.print("아이디: ");
@@ -32,7 +32,8 @@ public class Login {
                         AdminMenu.showAdminMenu(sc);
                     }
                     loggedInNickname = userInfo[4];
-                    System.out.println(userInfo[4]+"님 환영합니다.");
+                    loggedInPassword = existingPassword;
+                    System.out.println(userInfo[4] + "님 환영합니다.");
                     UserMenu.showUserMenu(sc, id);
                     return true; // 로그인 성공
                 }
@@ -45,7 +46,6 @@ public class Login {
         System.out.println("아이디 또는 비밀번호가 일치하지 않습니다. 다시 시도해주세요.");
         return false; // 로그인 실패
     }
-
 
     public static void loginMenu() {
         Scanner sc = new Scanner(System.in);
@@ -68,8 +68,7 @@ public class Login {
             }
         }
     }
-    
-    
+
     public static String getLoggedInNickname() {
         return loggedInNickname;
     }
@@ -78,14 +77,11 @@ public class Login {
         loggedInNickname = nickname;
     }
 
+    public static String getLoggedInPassword() {
+        return loggedInPassword;
+    }
 
-	public static void setLoggedInPassword(String newPassword) {
-		LoggedInPassword = newPassword;
-	}
-
-	public static String getLoggedInPassword() {
-		return LoggedInPassword;
-	}
-
-
+    public static void setLoggedInPassword(String newPassword) {
+        loggedInPassword = newPassword;
+    }
 }
