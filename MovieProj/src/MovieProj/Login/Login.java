@@ -13,7 +13,7 @@ public class Login {
     private static final String USERS_FILE = "users.txt";
     private static String loggedInNickname;
     private static String LoggedInPassword;
-    
+
     public static boolean login(Scanner sc) {
         System.out.print("아이디: ");
         String id = sc.next();

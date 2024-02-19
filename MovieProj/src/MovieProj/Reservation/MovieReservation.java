@@ -9,8 +9,7 @@ public class MovieReservation {
 
     // 영화 예매를 선택했을 때 나올 선택지 구현
     public static void showMovieReservationMenu(Scanner sc, String id) {
-
-        Scanner scanner = new Scanner(System.in);
+        //id 변수를 Login -> UserMenu -> MovieMenu 에서 지금 파일로 매개변수를 통해 계속 전달.
 
         String theater = "";
         String movieName = "";
@@ -23,7 +22,7 @@ public class MovieReservation {
         while (true) {
             System.out.println("원하시는 영화관을 선택하세요 1. CGV홍대점  2. CGV강남점  3. CGV구로점 ");
             System.out.print("입력란: ");
-            int num1 = scanner.nextInt();
+            int num1 = sc.nextInt();
             if (num1 == 1) {
                 theater = "CGV홍대점";
                 break;
@@ -44,7 +43,7 @@ public class MovieReservation {
             System.out.println();
             System.out.println("관람하고 싶으신 영화를 선택하세요 1. 웡카 2.귀멸의칼날: 인연의 기적 3. 시민 덕희");
             System.out.print("입력란: ");
-            int num2 = scanner.nextInt();
+            int num2 = sc.nextInt();
             if (num2 == 1) {
                 movieName = "웡카";
                 break;
@@ -65,7 +64,7 @@ public class MovieReservation {
             System.out.println();
             System.out.println("관람하고 싶은 날짜를 선택하세요 1. 02/20  2. 02/21  3. 02/22");
             System.out.print("입력란: ");
-            int num3 = scanner.nextInt();
+            int num3 = sc.nextInt();
             if (num3 == 1) {
                 date = "02/20";
                 break;
@@ -86,7 +85,7 @@ public class MovieReservation {
             System.out.println();
             System.out.println("원하시는 상영시간을 선택하세요 1. 09:20  2. 12:10  3. 17:15");
             System.out.print("입력란: ");
-            int num4 = scanner.nextInt();
+            int num4 = sc.nextInt();
             if (num4 == 1) {
                 showTime = "09:20";
                 break;
@@ -107,7 +106,7 @@ public class MovieReservation {
             System.out.println();
             System.out.println("영화관람 인원수를 입력하세요 (최대 10인 제한)");
             System.out.print("입력란: ");
-            people = scanner.nextInt();
+            people = sc.nextInt();
             if (people <= 10 && people > 0) {
                 break;
             } else {
@@ -150,14 +149,14 @@ public class MovieReservation {
                             date.equals(reservedDate) && showTime.equals(reservedShowTime)) {
                         String[] reservedSeats = seatInfo[6].split(" ");
                         for (String seat : reservedSeats) {
-                            char row = seat.charAt(0); // 입력값의 행과 열 분리작업
+                            char row = seat.charAt(0); // 이미 예매된 자리의 알파벳과 숫자 분리작업
                             char col = seat.charAt(1);
 
-                            int rowIndex = row - 'A'; // 사용자가 'A'를 입력했다면 'A' - 'A'는 0, 'B'를 입력했다면 1 (아스키코드)
-                            int colIndex = col - '1'; //'1'을 입력했다면 '1' - '1'은 0이 되고, '2'를 입력했다면 1이 됨 이 계산값이 인덱스가 된다.
+                            int rowIndex = row - 'A'; //인덱스는 첫 숫자가 0이므로 'A'와 '1'을 빼줌
+                            int colIndex = col - '1';
 
                             if (rowIndex >= 0 && rowIndex < ROWS && colIndex >= 0 && colIndex < COLS) {
-                                seatsarr[rowIndex][colIndex] = '■'; // 입력한 좌석의 칸을 칠함
+                                seatsarr[rowIndex][colIndex] = '■'; // 해당 좌석의 칸을 칠함
                             }
                         }
                     }
@@ -168,6 +167,9 @@ public class MovieReservation {
             System.out.println("파일을 읽는 도중 오류가 발생했습니다: " + e.getMessage());
         }
 
+
+
+        //8. 좌석배치도 출력
         System.out.println();
         System.out.println("");
         System.out.println("");
@@ -207,7 +209,7 @@ public class MovieReservation {
             for (int p = 0; p < people; ) {
                 int pp = p + 1;
                 System.out.print("입력란" + pp + ": ");
-                seats = scanner.next();
+                seats = sc.next();
 
                 char row = seats.charAt(0); // 입력값의 행과 열 분리작업
                 char col = seats.charAt(1);
@@ -235,7 +237,6 @@ public class MovieReservation {
         }
 
         System.out.println();
-        System.out.println("선택하신 좌석이 맞는지 확인하세요");
         System.out.println("");
         System.out.println("           +————————————+");
         System.out.println("               screen");
@@ -262,6 +263,20 @@ public class MovieReservation {
         System.out.println("");
         System.out.println("        1 2   3 4 5 6 7   8 9");
         System.out.println("");
-
+        System.out.println("예매가 완료되었습니다.");
+        System.out.println();
     }
+
+    public static void createMovieFileIfNotExists() {
+        File file = new File(MOVIES_FILE_PATH);
+        if (!file.exists()) {
+            try {
+                file.createNewFile();
+            } catch (IOException e) {
+                System.out.println("movies.txt 파일을 생성하는 중 오류가 발생했습니다.");
+                e.printStackTrace();
+            }
+        }
+    }
+
 }

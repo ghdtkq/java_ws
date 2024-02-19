@@ -12,22 +12,20 @@ import java.util.Scanner;
 
 public class ResCancle {
 
-	public static void resCancle(String id){
+	public static void resCancle(Scanner sc, String id){
 		ResCheck.resCheck(id);//예약목록 출력
-		
-		Scanner scanner = new Scanner(System.in);
 		System.out.println("몇 번 예약을 취소하시겠습니까?(숫자만 입력, 취소는 0) :");
-		int cancleNum = scanner.nextInt();
+		int cancleNum = sc.nextInt();
 		switch(cancleNum) {
 		case 0:
-			MovieMenu.showMovieMenu(scanner, id);
+			MovieMenu.showMovieMenu(sc, id);
 		default:
-			resCancler(cancleNum, id);
+			resCancler(sc, cancleNum, id);
 		}
 		
 	}
 
-	private static void resCancler(int cancleNum, String id) {
+	private static void resCancler(Scanner sc, int cancleNum, String id) {
 		final String Res_file = "movies.txt";
 		int allchk = -1;	//전체 목록 체커
 		String[] allList = new String[100];//전체 예약 목록
@@ -53,7 +51,7 @@ public class ResCancle {
 			
 			if(cancleNum>chk){	//만약 입력받은 숫자가 resList의 칼럼수보다 많다면
 				System.out.println("다시 입력해주세요!");
-				ResCancle.resCancle(id);	//다시 처음으로
+				ResCancle.resCancle(sc, id);	//다시 처음으로
 			}
 			else {
 			//resList[cancleNum-1] -> 유저가 선택한 라인
@@ -88,10 +86,8 @@ public class ResCancle {
 			}
 			
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

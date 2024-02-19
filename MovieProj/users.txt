@@ -1,0 +1,4 @@
+admin,99,admin,admin,관리자
+양홍섭,24,a,123,aa
+양홍섭,21,aaa,123,aaa
+a,12,b,123,b

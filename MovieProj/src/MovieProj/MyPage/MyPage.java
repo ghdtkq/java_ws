@@ -1,23 +1,21 @@
 package MovieProj.MyPage;
 
-import MovieProj.Admin.AdminMenu;
 import MovieProj.Login.Login;
 
 import java.util.*;
 import java.io.*;
-import java.nio.*;
-import java.nio.file.*;
 
 import static MovieProj.Login.Login.loginMenu;
+import static MovieProj.Reservation.UserMenu.showUserMenu;
 
 public class MyPage {
     private static final String USERS_FILE = "users.txt";
 
-    public static void showMyPageMenu(Scanner sc) {
+    public static void showMyPageMenu(Scanner sc, String id) {
         boolean loggedIn = true;
 
         while (loggedIn) {
-            System.out.println("===== 1. 내 정보 변경 2. 회원탈퇴 =====");
+            System.out.println("===== 1. 내 정보 변경 2. 회원탈퇴 3. 뒤로가기 =====");
             int choice = sc.nextInt();
             sc.nextLine();
 
@@ -28,6 +26,9 @@ public class MyPage {
                 case 2:
                     withdrawMembership(sc);
                     loggedIn = false;
+                    break;
+                case 3:
+                    showUserMenu(sc, id);
                     break;
                 default:
                     System.out.println("잘못된 선택입니다.");
@@ -66,8 +67,13 @@ public class MyPage {
         System.out.print("변경할 닉네임을 입력해주세요: ");
         String newNickname = sc.nextLine();
 
+        if (!currentNickname.equals(newNickname) && isNicknameExists(newNickname)) {
+            System.out.println("이미 존재하는 닉네임입니다. 다시 시도해주세요.");
+            return;
+        }
+
         if (updateNickname(currentNickname, newNickname)) {
-            System.out.println(newNickname+" 닉네임으로 변경하였습니다.");
+            System.out.println(newNickname + " 닉네임으로 변경하였습니다.");
             setNewNickname(newNickname);
         } else {
             System.out.println("닉네임 변경에 실패하였습니다.");

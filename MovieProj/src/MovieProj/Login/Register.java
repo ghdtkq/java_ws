@@ -102,7 +102,17 @@ public class Register {
         return age;
     }
 
-
+    public static void createUserFileIfNotExists() {
+        File file = new File(USERS_FILE);
+        if (!file.exists()) {
+            try {
+                file.createNewFile();
+            } catch (IOException e) {
+                System.out.println("users.txt 파일을 생성하는 중 오류가 발생했습니다.");
+                e.printStackTrace();
+            }
+        }
+    }
 
 
 }
