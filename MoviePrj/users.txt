@@ -1,2 +1,0 @@
-admin,99,admin,admin,admin
-양홍섭,24,ghdtkq,123,ghdtkq
